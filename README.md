@@ -10,7 +10,15 @@ Quick hardware test sketches, built and flashed with `arduino-cli`.
 | `ph_test/` | NodeMCU ESP8266 | Reads ADIY pH board output on A0 |
 | `ph_web/` | NodeMCU ESP8266 | Live pH web UI over WiFi at `http://ph.local` |
 
-For `ph_web`, copy `ph_web/secrets.h.example` to `ph_web/secrets.h` and fill in your WiFi details (it is gitignored).
+### WiFi setup for `ph_web` (no reflashing needed)
+
+1. Power the NodeMCU. If it has no saved WiFi, it creates a hotspot called `pH-Setup`.
+2. Join `pH-Setup` from a phone or laptop. A setup page opens (if not, browse to `http://192.168.4.1`).
+3. Choose "Configure WiFi", pick your network, enter the password, Save.
+4. Join your normal WiFi again and open `http://ph.local`.
+
+To change networks: power-cycle the board and press FLASH while the blue LED is on (first 3 seconds).
+Needs `arduino-cli lib install WiFiManager` to build.
 The pH value is an uncalibrated estimate until calibrated with buffer solutions.
 
 ## pH sensor wiring (NodeMCU)
