@@ -86,8 +86,13 @@ void setup() {
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("\nConnecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+    delay(1000);
+    switch (WiFi.status()) {
+      case WL_NO_SSID_AVAIL:   Serial.println("network not found"); break;
+      case WL_WRONG_PASSWORD:  Serial.println("wrong password"); break;
+      case WL_CONNECT_FAILED:  Serial.println("connection failed"); break;
+      default:                 Serial.print("."); break;
+    }
   }
   Serial.printf("\nConnected! Open http://%s or http://ph.local\n",
                 WiFi.localIP().toString().c_str());
