@@ -10,15 +10,20 @@ Quick hardware test sketches, built and flashed with `arduino-cli`.
 | `ph_test/` | NodeMCU ESP8266 | Reads ADIY pH board output on A0 |
 | `ph_web/` | NodeMCU ESP8266 | Live pH web UI over WiFi at `http://ph.local` |
 
-### WiFi setup for `ph_web` (no reflashing needed)
+### Setting up `ph_web` (Windows, Arduino IDE)
 
-1. Power the NodeMCU. If it has no saved WiFi, it creates a hotspot called `pH-Setup`.
-2. Join `pH-Setup` from a phone or laptop. A setup page opens (if not, browse to `http://192.168.4.1`).
-3. Choose "Configure WiFi", pick your network, enter the password, Save.
-4. Join your normal WiFi again and open `http://ph.local`.
+1. Install the [Arduino IDE](https://www.arduino.cc/en/software).
+2. File -> Preferences -> "Additional boards manager URLs", add
+   `https://arduino.esp8266.com/stable/package_esp8266com_index.json`
+3. Tools -> Board -> Boards Manager, install **esp8266**.
+4. If Windows doesn't detect the board, install the CH340 USB driver.
+5. Open `ph_web/ph_web.ino` and replace `your-wifi-ssid` / `your-wifi-password`
+   with your WiFi details (2.4 GHz network).
+6. Tools -> Board: **NodeMCU 1.0 (ESP-12E Module)**, Tools -> Port: the board's COM port.
+7. Click Upload. Open Serial Monitor at 115200 baud to see the board's IP address.
+8. On the same WiFi, open `http://ph.local` or that IP in a browser.
 
-To change networks: power-cycle the board and press FLASH while the blue LED is on (first 3 seconds).
-Needs `arduino-cli lib install WiFiManager` to build.
+Make sure nothing is connected to D4 while uploading.
 The pH value is an uncalibrated estimate until calibrated with buffer solutions.
 
 ## pH sensor wiring (NodeMCU)

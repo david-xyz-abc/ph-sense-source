@@ -1,17 +1,14 @@
 // pH sensor web UI for NodeMCU ESP8266
 // Wiring: pH board O/P "+" -> A0, O/P "-" -> GND, pH board on its own 9V supply
-// WiFi setup: on first boot (or after reset) the board opens a "pH-Setup" hotspot
-// with a setup page to choose a WiFi network. Press FLASH while the blue LED is on
-// (first 3 seconds after power-up) to forget the saved WiFi.
 // Open http://ph.local or the IP printed on serial
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
-#include <WiFiManager.h>
 
-const int FLASH_BUTTON = 0;  // GPIO0, LOW when pressed
-const int BLUE_LED = 2;      // GPIO2, LOW = on
+// Put your WiFi details here (2.4 GHz network only)
+#define WIFI_SSID "your-wifi-ssid"
+#define WIFI_PASSWORD "your-wifi-password"
 
 // Uncalibrated estimate: assumes output is linear 500mV (pH 0) .. 3000mV (pH 14).
 // Replace with two-point calibration from buffer solutions for real values.
@@ -88,33 +85,19 @@ void handleData() {
 void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
-  WiFiManager wm;
-
-  // 3 second window after power-up: press FLASH to forget saved WiFi
-  pinMode(FLASH_BUTTON, INPUT_PULLUP);
-  pinMode(BLUE_LED, OUTPUT);
-  digitalWrite(BLUE_LED, LOW);
-  unsigned long start = millis();
-  while (millis() - start < 3000) {
-    if (digitalRead(FLASH_BUTTON) == LOW) {
-      Serial.println("\nFLASH pressed: forgetting saved WiFi");
-      wm.resetSettings();
-      break;
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("\nConnecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    switch (WiFi.status()) {
+      case WL_NO_SSID_AVAIL:   Serial.println("network not found"); break;
+      case WL_WRONG_PASSWORD:  Serial.println("wrong password"); break;
+      case WL_CONNECT_FAILED:  Serial.println("connection failed"); break;
+      default:                 Serial.print("."); break;
     }
-    delay(10);
   }
-  digitalWrite(BLUE_LED, HIGH);
-
-  // Connects with saved WiFi, or opens the "pH-Setup" hotspot + setup page.
-  // Restart if nobody finishes setup within 5 minutes, then try again.
-  wm.setConfigPortalTimeout(300);
-  Serial.println("\nConnecting to WiFi (or open the pH-Setup hotspot to configure)");
-  if (!wm.autoConnect("pH-Setup")) {
-    Serial.println("WiFi setup timed out, restarting");
-    ESP.restart();
-  }
-  Serial.printf("Connected to %s! Open http://%s or http://ph.local\n",
-                WiFi.SSID().c_str(), WiFi.localIP().toString().c_str());
+  Serial.printf("\nConnected! Open http://%s or http://ph.local\n",
+                WiFi.localIP().toString().c_str());
 
   MDNS.begin("ph");
   server.on("/", [] { server.send_P(200, "text/html", PAGE); });
