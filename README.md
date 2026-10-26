@@ -8,6 +8,10 @@ Quick hardware test sketches, built and flashed with `arduino-cli`.
 | `i2c_diag/` | ESP32 | I2C line-level check + bus scan on D4/D15 |
 | `volt_check/` | ESP32 | Reads voltage on D4/D15 |
 | `ph_test/` | NodeMCU ESP8266 | Reads ADIY pH board output on A0 |
+| `ph_web/` | NodeMCU ESP8266 | Live pH web UI over WiFi at `http://ph.local` |
+
+For `ph_web`, copy `ph_web/secrets.h.example` to `ph_web/secrets.h` and fill in your WiFi details (it is gitignored).
+The pH value is an uncalibrated estimate until calibrated with buffer solutions.
 
 ## pH sensor wiring (NodeMCU)
 
